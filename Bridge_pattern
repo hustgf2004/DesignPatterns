@@ -1,0 +1,73 @@
+#include <iostream>
+
+using namespace std;
+
+//Implementor for bridge pattern
+class Workshop{
+	public:
+		virtual void work() = 0;
+};
+//abstraction in bridge pattern
+class Vehicle{
+	protected:
+		Workshop *workShop1;
+		Workshop *workShop2;
+	public:
+		virtual void manufacture() = 0; 
+};
+
+//Refine abstraction 1 in bridge patern
+class Car : public Vehicle{
+	public:
+		Car(Workshop *workShop1, Workshop *workShop2){
+			this->workShop1 = workShop1;
+			this->workShop2 = workShop2;
+		}
+		void manufacture(){
+			cout << "Car";
+			workShop1->work();
+			workShop2->work();
+		}
+};
+
+//Refine abstraction 2 in bridge pattern
+class Bike : public Vehicle{
+	public:
+		Bike(Workshop *workShop1, Workshop *workShop2){
+			this->workShop1 = workShop1;
+			this->workShop2 = workShop2;
+		}
+		void manufacture()
+		{
+			cout << "Bike";
+			workShop1->work();
+			workShop2->work();
+		}
+};
+
+
+
+//Concrete implementatino 1 for bridge pattern
+class Produce : public Workshop{
+	void work()
+	{
+		cout << "Produced";
+	}
+};
+
+//Concrete implementation 2 for bridge pattern
+class Assemble : public Workshop{
+	void work()
+	{
+		cout << "And";
+		cout << " Assembled.\n";
+	}
+};
+
+Bridge_pattern_test()
+{
+	Vehicle *vehicle1 = new Car(new Produce(), new Assemble());
+	vehicle1->manufacture();
+	Vehicle *vehicle2 = new Bike(new Produce(), new Assemble());
+	vehicle2->manufacture();
+}
