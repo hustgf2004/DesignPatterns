@@ -1,0 +1,128 @@
+/*
+Adapter pattern works as a bridge between two incompatible interfaces. This type of design
+comes under structual pattern as this pattern combines the capability of two independent
+interfaces.
+This pattern involves a single class which is responsible to join functionalities of independent
+or incompatible interfaces.
+We are demonstrating use of Adapter pattern via following example in which an audio player
+device can play mp3 files only and wants to use an advanced audio player capable of playing 
+vlc and mp4 files.
+
+Implementation
+We have a MediaPlayer interface and a concrete class AudioPlayer implementing the MediaPlayer
+interface.AudioPlayer can play mp3 format audio files by default.
+
+We are having another interface AdvancedMediaPlayer and concrete classes implementing the 
+AdvancedMediaPlayer interface.These classes can play vlc and mp4 format files.
+
+We want to make AudioPlayer to play other formats as well.To attain this, we have created
+an adapter class MediaAdapter which implements the MediaPlayer interface and uses 
+AdvancedMediaPlayer objects to play the required format.
+
+AudioPlayer uses the adapter class MediaAdapter passing it the desired audio type without
+knowing the actual class which can play the desired format AdapterPatternDemo.our demo
+class will use AudioPlayer class to play various formats.
+*/
+
+#include <iostream>
+
+using namespace std;
+
+bool icompare_pred(unsigned char a, unsigned char b)
+{
+    return std::tolower(a) == std::tolower(b);
+}
+
+bool icasecompare(std::string const& a, std::string const& b)
+{
+    if (a.length() == b.length()) {
+        return std::equal(b.begin(), b.end(),
+                           a.begin(), icompare_pred);
+    }
+    else {
+        return false;
+    }
+}
+
+
+
+//Create interfaces for Media Player and Advacned Media Player
+class MediaPlayer{
+	virtual void play(string audioType, string fileName)=0;
+};
+
+class AdvancedMediaPlayer{
+	public:
+		virtual void playVlc(string fileName) = 0;
+		virtual void playMp4(string fileName) = 0;
+};
+
+//Create concrete classes implementing the AdvancedMediaPlayer interface
+class VlcPlayer : public AdvancedMediaPlayer{
+	void playVlc(string fileName){
+		cout <<"Playing vlc file. Name: "<<fileName<<endl;
+	}
+	void playMp4(string fileName){
+		
+	}
+}; 
+
+class Mp4Player : public AdvancedMediaPlayer{
+	void playVlc(string fileName){
+		
+	}
+	void playMp4(string fileName){
+		cout << "Playing mp4 file. Name: " << fileName<<endl;
+	}
+};
+
+// step3
+//Create adapter class implementing the MediaPlayer interface.
+class MediaAdapter : public MediaPlayer{
+	AdvancedMediaPlayer *advancedMusicPlayer;
+	public:
+		MediaAdapter(string audioType){
+			if(icasecompare(audioType,"vlc")){
+				advancedMusicPlayer = new VlcPlayer();
+			}
+			else if (icasecompare(audioType,"mp4")){
+				advancedMusicPlayer = new Mp4Player();
+			}
+		}
+		void play(string audioType, string fileName){
+			if (icasecompare(audioType, "vlc")){
+				advancedMusicPlayer->playVlc(fileName);
+			}
+			else if (icasecompare(audioType, "mp4")){
+				advancedMusicPlayer->playMp4(fileName);
+			}
+		}
+};
+
+//Create concrete class implementing the MediaPlayer interface
+class AudioPlayer : public MediaPlayer{
+	MediaAdapter *mediaAdapter;
+	public:
+		void play(string audioType, string fileName){
+			if (icasecompare(audioType,"mp3")){
+				cout << "Playing mp3 file. Name: "<< fileName<<endl;
+			}
+			else if(icasecompare(audioType,"vlc") || icasecompare(audioType,"mp4")){
+				mediaAdapter = new MediaAdapter(audioType);
+				mediaAdapter->play(audioType, fileName);
+			}
+			else{
+				cout << "Invalid media." << audioType << " format not supported" << endl;
+			}
+		}
+};
+
+Adapter_pattern_test()
+{
+	AudioPlayer *audioPlayer = new AudioPlayer();
+	audioPlayer->play("mp3","beyond the horizon.mp3");
+	audioPlayer->play("mp4","alone.mp4");
+	audioPlayer->play("vlc","far far away.vlc");
+	audioPlayer->play("avi","mind me.avi");
+}
+
